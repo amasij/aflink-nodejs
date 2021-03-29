@@ -1,0 +1,19 @@
+{
+  "type": "postgres",
+  "host": "localhost",
+  "port": 5432,
+  "username": "aflinkdbuser",
+  "password": "password",
+  "database": "aflinkdb",
+  "synchronize": true,
+  "logging": true,
+  "entities": [
+    "src/models/**/*.ts"
+  ],
+  "migrations": [
+    "src/migration/**/*.ts"
+  ],
+  "subscribers": [
+    "src/subscriber/**/*.ts"
+  ]
+}

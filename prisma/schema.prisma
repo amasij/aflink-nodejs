@@ -9,3 +9,209 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+model User {
+  id           Int                  @id @default(autoincrement())
+  email        String               @unique
+  firstName    String
+  lastName     String
+  dateCreated  DateTime
+  phoneNumber  String               @unique
+  username     String               @unique
+  password     String
+  biography    String?
+  dateOfBirth  DateTime
+  occupation   String?
+  height       Decimal
+  isDrinker    Boolean
+  isSmoker     Boolean
+  isVerified   Boolean
+  religion     Religion?
+  status       EntityStatusConstant @default(INACTIVE)
+  gender       GenderConstant?
+  sexuality    SexualityConstant?
+  Post         Post[]
+  sender       Conversation[]       @relation(name: "sender")
+  receiver     Conversation[]       @relation(name: "receiver")
+  Like         Like[]
+  Comment      Comment[]
+  Flag         Flag[]
+  UserMedia    UserMedia[]
+  UserLanguage UserLanguage[]
+}
+
+model Post {
+  id          Int                  @id @default(autoincrement())
+  dateCreated DateTime             @default(now())
+  datePosted  DateTime
+  textContent String               @db.VarChar(255)
+  content     String?
+  isPublished Boolean              @default(false)
+  author      User                 @relation(fields: [authorId], references: [id])
+  authorId    Int
+  imageFile   ImageFile            @relation(fields: [imageFileId], references: [id])
+  imageFileId Int
+  status      EntityStatusConstant @default(INACTIVE)
+  Like        Like[]
+  Comment     Comment[]
+  Flag        Flag[]
+}
+
+model ImageFile {
+  id          Int                  @id @default(autoincrement())
+  name        String
+  date        Bytes
+  contentType String?
+  status      EntityStatusConstant @default(INACTIVE)
+  dateCreated DateTime             @default(now())
+  Post        Post[]
+  Chat        Chat[]
+  UserMedia   UserMedia[]
+}
+
+model Conversation {
+  id          Int      @id @default(autoincrement())
+  token       String
+  sender      User     @relation(name: "sender", fields: [senderId], references: [id])
+  senderId    Int
+  receiver    User     @relation(name: "receiver", fields: [receiverId], references: [id])
+  receiverId  Int
+  dateCreated DateTime @default(now())
+  Chat        Chat[]
+}
+
+model Chat {
+  id             Int             @id @default(autoincrement())
+  token          String
+  conversation   Conversation    @relation(fields: [conversationId], references: [id])
+  conversationId Int
+  textContent    String?
+  imageFile      ImageFile       @relation(fields: [imageContent], references: [id])
+  imageContent   Int
+  dateCreated    DateTime        @default(now())
+  type           ChatMessageType
+}
+
+model Like {
+  id          Int      @id @default(autoincrement())
+  post        Post     @relation(fields: [postId], references: [id])
+  postId      Int
+  user        User     @relation(fields: [likedBy], references: [id])
+  likedBy     Int
+  dateCreated DateTime @default(now())
+}
+
+model Comment {
+  id          Int                  @id @default(autoincrement())
+  post        Post                 @relation(fields: [postId], references: [id])
+  postId      Int
+  user        User                 @relation(fields: [madeBy], references: [id])
+  madeBy      Int
+  dateCreated DateTime             @default(now())
+  status      EntityStatusConstant @default(INACTIVE)
+}
+
+model Flag {
+  id          Int      @id @default(autoincrement())
+  reason      String
+  postId      Int
+  post        Post     @relation(fields: [postId], references: [id])
+  user        User     @relation(fields: [reporter], references: [id])
+  reporter    Int
+  isHandled   Boolean
+  dateCreated DateTime @default(now())
+}
+
+model UserMedia {
+  id      Int                   @id @default(autoincrement())
+  type    UserMediaTypeConstant @default(GALLERY)
+  userId  Int
+  user    User                  @relation(fields: [userId], references: [id])
+  imageId Int
+  image   ImageFile             @relation(fields: [imageId], references: [id])
+}
+
+model Language {
+  id           Int            @id @default(autoincrement())
+  name         String
+  UserLanguage UserLanguage[]
+}
+
+model UserLanguage {
+  id         Int                  @id @default(autoincrement())
+  userId     Int
+  user       User                 @relation(fields: [userId], references: [id])
+  languageId Int
+  language   Language             @relation(fields: [languageId], references: [id])
+  status     EntityStatusConstant @default(INACTIVE)
+}
+
+model State {
+  id          Int                  @id @default(autoincrement())
+  code        String
+  name        String
+  countryCode String
+  countyId    Int
+  country     Country              @relation(fields: [countyId], references: [id])
+  status      EntityStatusConstant @default(INACTIVE)
+  Address     Address[]
+}
+
+model Country {
+  id     Int                  @id @default(autoincrement())
+  code   String
+  name   String
+  status EntityStatusConstant @default(INACTIVE)
+  State  State[]
+}
+
+model GPSCoordinate {
+  id          Int                  @id @default(autoincrement())
+  latitude    Decimal?
+  longitude   Decimal?
+  status      EntityStatusConstant @default(INACTIVE)
+  dateCreated DateTime             @default(now())
+  Address     Address[]
+}
+
+model Address {
+  id              Int            @id @default(autoincrement())
+  gpsCoordinateId Int?
+  gpsCoordinate   GPSCoordinate? @relation(fields: [gpsCoordinateId], references: [id])
+  stateId         Int
+  state           State          @relation(fields: [stateId], references: [id])
+  streetAddress   String?
+  houseNumber     String?
+
+}
+
+enum UserMediaTypeConstant {
+  AVATAR
+  GALLERY
+}
+
+enum Religion {
+  CHRISTIAN
+  MUSLIM
+}
+
+enum EntityStatusConstant {
+  ACTIVE
+  INACTIVE
+}
+
+enum GenderConstant {
+  MALE
+  FEMALE
+}
+
+enum SexualityConstant {
+  GAY
+  STRAIGHT
+  BI_SEXUAL
+}
+
+enum ChatMessageType {
+  TEXT
+  IMAGE
+}
