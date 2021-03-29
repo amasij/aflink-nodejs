@@ -12,7 +12,7 @@ export class StateController extends RoutesConfig {
     configureRoutes() {
 
         this.app.route(`/states`)
-            .get(async (req: express.Request, res: express.Response) => {
+            .get(async (req: express.Request<{},{},{}>, res: express.Response) => {
                 const stateService:StateService = Container.get(StateService);
                 let alpha2 = req.query.alpha2;
                 let data = await stateService.getAllStatesByCountryAlpha2(alpha2 as string);

@@ -2,8 +2,8 @@ import {AppRepository} from "./appRepository";
 import {Service} from "typedi";
 import {BaseRepository} from "./baseRepository";
 import {State} from "../models/state";
-import {Country} from "../models/country";
 import {Repository} from "typeorm";
+import {Country} from "../models/country";
 import {EntityStatusConstant} from "../models/entityStatusConstant";
 
 @Service()
